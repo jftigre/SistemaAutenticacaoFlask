@@ -54,6 +54,23 @@ def create_user():
 
   return jsonify({"message": "Dados invalidos"}), 400
 
+@app.route('/user/<int:id_user>', methods=['PUT'])
+@login_required
+def uptade_user(id_user):
+   data = request.json
+   user = User.query.get(id_user)
+
+   if id_user != current_user.id and current_user.role == "user":
+      return jsonify({'message': "Operação não permitida"}), 403
+   
+   if user and data.get('password'):
+      user.password = data.get('password')
+      db.session.commit()
+
+      return jsonify({"message": "Usuario não encontrado"}), 404
+
+   
+
 
 if __name__ == '__main__':
     app.run(debug=True)
