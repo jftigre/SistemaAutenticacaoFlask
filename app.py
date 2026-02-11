@@ -65,7 +65,7 @@ def read_user(id_user):
 
 @app.route('/user/<int:id_user>', methods=['PUT'])
 @login_required
-def uptade_user(id_user):
+def update_user(id_user):
    data = request.json
    user = User.query.get(id_user)
 
