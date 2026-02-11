@@ -12,7 +12,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 login_manager.login_view = 'login'
-#Session <- conexão ativa
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -69,7 +68,23 @@ def uptade_user(id_user):
 
       return jsonify({"message": "Usuario não encontrado"}), 404
 
-   
+@app.route('/user/<int:id_user>', methods=["DELETE"])
+@login_required
+def delete_user(id_user):
+  user = User.query.get(id_user)
+
+  if current_user.role != "admin":
+     return jsonify({"message": "Operação não permitida"}), 403
+
+  if id_user == current_user.id:
+     return jsonify({"message": "Deleção não permitida"}), 403
+  
+  if user:
+     db.session.delete(user)
+     db.session.commit()
+     return jsonify({"message": f"Usuário {id_user} deletado com sucesso"})
+  
+  return jsonify({"message": "Usuario não encontrado"}), 404
 
 
 if __name__ == '__main__':
