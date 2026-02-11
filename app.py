@@ -17,7 +17,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
   return User.query.get(user_id)
 
-@app.route('/login', methods=["POST"])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.json
     username = data.get('username')
@@ -39,7 +39,7 @@ def logout():
     logout_user()
     return jsonify({"message": "Logout realizado com sucesso!"})
 
-@app.route('/user', methods=["POST"])
+@app.route('/user', methods=['POST'])
 def create_user():
   data = request.json
   username = data.get("username")
@@ -53,6 +53,16 @@ def create_user():
 
   return jsonify({"message": "Dados invalidos"}), 400
 
+@app.route('/user/<int:id_user>', methods=['GET'])
+@login_required
+def read_user(id_user):
+   user = User.query.get(id_user)
+
+   if user:
+      return {"username": user.username}
+
+   return jsonify({"message": "Usuário não encontrado"}), 404
+
 @app.route('/user/<int:id_user>', methods=['PUT'])
 @login_required
 def uptade_user(id_user):
@@ -65,10 +75,11 @@ def uptade_user(id_user):
    if user and data.get('password'):
       user.password = data.get('password')
       db.session.commit()
+      return jsonify({"message": "Usuário atualizado com sucesso"})
+   
+   return jsonify({"message": "Usuario não encontrado"}), 404
 
-      return jsonify({"message": "Usuario não encontrado"}), 404
-
-@app.route('/user/<int:id_user>', methods=["DELETE"])
+@app.route('/user/<int:id_user>', methods=['DELETE'])
 @login_required
 def delete_user(id_user):
   user = User.query.get(id_user)
