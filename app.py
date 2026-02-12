@@ -24,10 +24,10 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    if user and bcrypt.checkpw(str.encode(password), str.encode(user.password)):
+    if username and password:
         user = User.query.filter_by(username=username).first()
 
-        if user and user.password == password:
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
             login_user(user)
             print(current_user.is_authenticated)
             return jsonify({"message": "Autenticação realizada com sucesso!"})
@@ -75,7 +75,8 @@ def update_user(id_user):
       return jsonify({'message': "Operação não permitida"}), 403
    
    if user and data.get('password'):
-      user.password = data.get('password')
+      hashed_password = bcrypt.hashpw(data.get('password').encode('utf-8'), bcrypt.gensalt())
+      user.password = hashed_password
       db.session.commit()
       return jsonify({"message": "Usuário atualizado com sucesso"})
    
